@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lending Manager - Ledger</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>
+          <span class="ledger-icon">💰</span> Lending Manager
+        </h2>
+        <p class="subtitle">Track Your Lendings</p>
+      </div>
+
+      <nav class="sidebar-menu">
+        <button class="menu-item active" data-page="add-lending">
+          <span class="menu-icon">➕</span> Add Lending
+        </button>
+        <button class="menu-item" data-page="add-loan">
+          <span class="menu-icon">🏦</span> Add Loan
+        </button>
+        <div class="menu-section-title">Dashboards</div>
+        <button class="menu-item" data-page="dashboard-daily">
+          <span class="menu-icon">📆</span> Daily
+        </button>
+        <button class="menu-item" data-page="dashboard-weekly">
+          <span class="menu-icon">📅</span> Weekly
+        </button>
+        <button class="menu-item" data-page="dashboard-monthly">
+          <span class="menu-icon">📊</span> Monthly
+        </button>
+        <button class="menu-item" data-page="chit">
+          <span class="menu-icon">🧾</span> Chit
+        </button>
+        <button class="menu-item" data-page="loans">
+          <span class="menu-icon">🏦</span> Loans
+        </button>
+        <button class="menu-item" data-page="analytics">
+          <span class="menu-icon">📈</span> Analytics
+        </button>
+        <button class="menu-item" data-page="settings">
+          <span class="menu-icon">⚙️</span> Settings
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="device-toolbar">
+        <button type="button" id="refresh-data" class="refresh-button" title="Reload data" aria-label="Reload data">
+          <span class="refresh-icon" aria-hidden="true">↻</span>
+        </button>
+        <button type="button" id="device-toggle" class="device-toggle" title="Switch between mobile and desktop layout" aria-label="Switch layout">
+          <span class="device-option" data-device="mobile" aria-hidden="true">▯</span>
+          <span class="device-option" data-device="desktop" aria-hidden="true">▣</span>
+          <span id="device-toggle-label">Desktop</span>
+        </button>
+      </div>
+      <!-- Add Lending Page -->
+      <div id="add-lending" class="page active">
+        <div class="page-header">
+          <h1>Add New Lending</h1>
+          <p>Create a new lending record</p>
+        </div>
+
+        <form id="lending-form" class="lending-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="lender-name">PERSON NAME *</label>
+              <input type="text" id="lender-name" placeholder="e.g., Dinesh" required>
+            </div>
+            <div class="form-group">
+              <label for="lending-date">LENDING DATE *</label>
+              <input type="date" id="lending-date" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="principal-amount">PRINCIPAL AMOUNT (₹) *</label>
+              <input type="number" id="principal-amount" placeholder="10000" step="0.01" required>
+            </div>
+            <div class="form-group">
+              <label for="return-amount">RETURN AMOUNT (₹) *</label>
+              <input type="number" id="return-amount" placeholder="8500" step="0.01" required>
+            </div>
+            <div class="form-group">
+              <label for="interest-amount">INTEREST AMOUNT (₹) *</label>
+              <input type="number" id="interest-amount" placeholder="1500" step="0.01" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="lending-type">LENDING TYPE *</label>
+            <select id="lending-type" required onchange="updateLendingTypeFields()">
+              <option value="">-- Select Type --</option>
+              <option value="weekly">Weekly</option>
+              <option value="daily">Daily</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+
+          <!-- Weekly Fields -->
+          <div id="weekly-fields" class="conditional-fields" style="display: none;">
+            <div class="form-group">
+              <label for="weeks-duration">NUMBER OF WEEKS *</label>
+              <input type="number" id="weeks-duration" placeholder="10" min="1" step="1">
+            </div>
+            <div class="info-box">
+              Weekly Breakdown will be auto-calculated based on (Return Amount / Number of Weeks)
+            </div>
+          </div>
+
+          <!-- Daily Fields -->
+          <div id="daily-fields" class="conditional-fields" style="display: none;">
+            <div class="form-group">
+              <label for="daily-amount">DAILY RETURN AMOUNT (₹) *</label>
+              <input type="number" id="daily-amount" placeholder="850" step="0.01">
+            </div>
+            <div class="form-group">
+              <label for="daily-duration">EXPECTED DAYS TO COMPLETE *</label>
+              <input type="number" id="daily-duration" placeholder="10" min="1" step="1">
+            </div>
+            <div class="info-box">
+              Daily payments will accumulate based on the daily amount entered
+            </div>
+          </div>
+
+          <!-- Monthly Fields -->
+          <div id="monthly-fields" class="conditional-fields" style="display: none;">
+            <div class="form-group">
+              <label for="monthly-duration">NUMBER OF MONTHS *</label>
+              <input type="number" id="monthly-duration" placeholder="12" min="1" step="1">
+            </div>
+            <div class="form-group">
+              <label for="monthly-amount">MONTHLY RETURN AMOUNT (₹) *</label>
+              <input type="number" id="monthly-amount" placeholder="0.00" step="0.01">
+            </div>
+            <div class="info-box">
+              Monthly payment will be (Return Amount / Number of Months)
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="notes">NOTES</label>
+            <textarea id="notes" placeholder="Additional notes..."></textarea>
+          </div>
+
+          <button type="submit" class="submit-btn">✓ ADD LENDING</button>
+        </form>
+      </div>
+
+      <!-- Add Loan Page -->
+      <div id="add-loan" class="page">
+        <div class="page-header">
+          <h1>Add New Loan</h1>
+          <p>Save the bank loan details once, then record interest payments from the Loans tab</p>
+        </div>
+
+        <form id="loan-form" class="lending-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bank-name">BANK NAME *</label>
+              <input type="text" id="bank-name" placeholder="e.g., HDFC Bank" required>
+            </div>
+            <div class="form-group">
+              <label for="loan-date">LOAN DATE *</label>
+              <input type="date" id="loan-date" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="loan-amount">LOAN AMOUNT (₹) *</label>
+              <input type="number" id="loan-amount" min="0.01" step="0.01" placeholder="500000" required>
+            </div>
+            <div class="form-group">
+              <label for="monthly-interest">MONTHLY INTEREST (₹) *</label>
+              <input type="number" id="monthly-interest" min="0.01" step="0.01" placeholder="4500" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="loan-notes">NOTES</label>
+            <textarea id="loan-notes" placeholder="Account number or other notes..." rows="3"></textarea>
+          </div>
+          <button type="submit" class="submit-btn">✓ ADD LOAN</button>
+        </form>
+      </div>
+
+      <!-- Daily Dashboard Page -->
+      <div id="dashboard-daily" class="page">
+        <div class="page-header">
+          <h1>Daily Dashboard</h1>
+          <p>Daily Lending Overview</p>
+        </div>
+
+        <!-- Metrics Cards -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">TOTAL LENT</div>
+            <div class="metric-value">₹<span id="daily-total-lent">0</span></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">TOTAL RECEIVED</div>
+            <div class="metric-value income">₹<span id="daily-total-received">0</span></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">OUTSTANDING</div>
+            <div class="metric-value expense">₹<span id="daily-outstanding">0</span></div>
+          </div>
+        </div>
+
+        <!-- Lendings List -->
+        <div class="lendings-section">
+          <h2>Daily Lendings</h2>
+          <div class="lending-status-tabs" role="tablist" aria-label="Daily lending status">
+            <button type="button" class="status-tab active" data-lending-type="daily" data-status="active">Active</button>
+            <button type="button" class="status-tab" data-lending-type="daily" data-status="closed">Closed</button>
+          </div>
+          <div id="daily-lendings-list" class="lendings-list lending-status-list" data-status="active">
+            <!-- Lendings will be populated here -->
+          </div>
+          <div id="daily-closed-lendings-list" class="lendings-list lending-status-list" data-status="closed" hidden></div>
+        </div>
+      </div>
+
+      <!-- Weekly Dashboard Page -->
+      <div id="dashboard-weekly" class="page">
+        <div class="page-header">
+          <h1>Weekly Dashboard</h1>
+          <p>Weekly Lending Overview</p>
+        </div>
+
+        <!-- Metrics Cards -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">TOTAL LENT</div>
+            <div class="metric-value">₹<span id="weekly-total-lent">0</span></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">TOTAL RECEIVED</div>
+            <div class="metric-value income">₹<span id="weekly-total-received">0</span></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">OUTSTANDING</div>
+            <div class="metric-value expense">₹<span id="weekly-outstanding">0</span></div>
+          </div>
+        </div>
+
+        <!-- Lendings List -->
+        <div class="lendings-section">
+          <h2>Weekly Lendings</h2>
+          <div class="lending-status-tabs" role="tablist" aria-label="Weekly lending status">
+            <button type="button" class="status-tab active" data-lending-type="weekly" data-status="active">Active</button>
+            <button type="button" class="status-tab" data-lending-type="weekly" data-status="closed">Closed</button>
+          </div>
+          <div id="weekly-lendings-list" class="lendings-list lending-status-list" data-status="active">
+            <!-- Lendings will be populated here -->
+          </div>
+          <div id="weekly-closed-lendings-list" class="lendings-list lending-status-list" data-status="closed" hidden></div>
+        </div>
+      </div>
+
+      <!-- Monthly Dashboard Page -->
+      <div id="dashboard-monthly" class="page">
+        <div class="page-header">
+          <h1>Monthly Dashboard</h1>
+          <p>Monthly Lending Overview</p>
+        </div>
+
+        <!-- Metrics Cards -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">TOTAL LENT</div>
+            <div class="metric-value">₹<span id="monthly-total-lent">0</span></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">TOTAL RECEIVED</div>
+            <div class="metric-value income">₹<span id="monthly-total-received">0</span></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">OUTSTANDING</div>
+            <div class="metric-value expense">₹<span id="monthly-outstanding">0</span></div>
+          </div>
+        </div>
+
+        <!-- Lendings List -->
+        <div class="lendings-section">
+          <h2>Monthly Lendings</h2>
+          <div class="lending-status-tabs" role="tablist" aria-label="Monthly lending status">
+            <button type="button" class="status-tab active" data-lending-type="monthly" data-status="active">Active</button>
+            <button type="button" class="status-tab" data-lending-type="monthly" data-status="closed">Closed</button>
+          </div>
+          <div id="monthly-lendings-list" class="lendings-list lending-status-list" data-status="active">
+            <!-- Lendings will be populated here -->
+          </div>
+          <div id="monthly-closed-lendings-list" class="lendings-list lending-status-list" data-status="closed" hidden></div>
+        </div>
+      </div>
+
+      <!-- Chit Page -->
+      <div id="chit" class="page">
+        <div class="page-header">
+          <h1>Chit</h1>
+          <p>Track chit amounts and record each payment with its date</p>
+        </div>
+
+        <form id="chit-form" class="lending-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="chit-person-name">PERSON NAME *</label>
+              <input type="text" id="chit-person-name" placeholder="e.g., Prakash" required>
+            </div>
+            <div class="form-group">
+              <label for="chit-amount">CHIT AMOUNT (₹) *</label>
+              <input type="number" id="chit-amount" min="0.01" step="0.01" placeholder="100000" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="chit-notes">NOTES</label>
+            <textarea id="chit-notes" placeholder="Enter your notes..." rows="4"></textarea>
+          </div>
+          <button type="submit" class="submit-btn">✓ ADD CHIT</button>
+        </form>
+
+        <div class="metrics-grid chit-metrics">
+          <div class="metric-card"><div class="metric-label">TOTAL CHIT AMOUNT</div><div class="metric-value">₹<span id="chit-total-amount">0.00</span></div></div>
+          <div class="metric-card"><div class="metric-label">TOTAL PAID</div><div class="metric-value income">₹<span id="chit-total-paid">0.00</span></div></div>
+          <div class="metric-card"><div class="metric-label">REMAINING AMOUNT</div><div class="metric-value expense">₹<span id="chit-total-remaining">0.00</span></div></div>
+        </div>
+
+        <div class="lendings-section">
+          <h2>My Chits</h2>
+          <div class="lending-status-tabs" role="tablist" aria-label="Chit status">
+            <button type="button" class="status-tab active" data-record-type="chit" data-status="active">Active</button>
+            <button type="button" class="status-tab" data-record-type="chit" data-status="closed">Closed</button>
+          </div>
+          <div id="chit-list" class="lendings-list lending-status-list" data-status="active"></div>
+          <div id="closed-chit-list" class="lendings-list lending-status-list" data-status="closed" hidden></div>
+        </div>
+      </div>
+
+      <!-- Loans Page -->
+      <div id="loans" class="page">
+        <div class="page-header">
+          <h1>Bank Loans</h1>
+          <p>Track loan principal and the interest you pay each month</p>
+        </div>
+
+        <div class="metrics-grid loan-metrics">
+          <div class="metric-card"><div class="metric-label">TOTAL BORROWED</div><div class="metric-value">₹<span id="loans-total-amount">0.00</span></div></div>
+          <div class="metric-card"><div class="metric-label">INTEREST PAID</div><div class="metric-value income">₹<span id="loans-interest-paid">0.00</span></div></div>
+        </div>
+
+        <div class="lendings-section">
+          <div class="section-heading">
+            <h2>My Loans</h2>
+            <button type="button" class="btn-small" onclick="exportLoanReport()">📥 Export Loans CSV</button>
+          </div>
+          <div class="lending-status-tabs" role="tablist" aria-label="Loan status">
+            <button type="button" class="status-tab active" data-record-type="loan" data-status="active">Active</button>
+            <button type="button" class="status-tab" data-record-type="loan" data-status="closed">Closed</button>
+          </div>
+          <div id="loans-list" class="lendings-list lending-status-list" data-status="active"></div>
+          <div id="closed-loans-list" class="lendings-list lending-status-list" data-status="closed" hidden></div>
+        </div>
+      </div>
+
+      <!-- Analytics Page -->
+      <div id="analytics" class="page">
+        <div class="page-header">
+          <h1>Analytics</h1>
+          <p>Detailed Financial Report</p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="analytics-summary">
+          <div class="analytics-card">
+            <div class="analytics-title">Total Lended Amount</div>
+            <div class="analytics-value">₹<span id="analytics-total-lended">0</span></div>
+            <div class="analytics-desc">Total principal amount lent</div>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-title">Total Outstanding</div>
+            <div class="analytics-value">₹<span id="analytics-outstanding">0</span></div>
+            <div class="analytics-desc">Amount still to be collected</div>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-title">Amount in Hand</div>
+            <div class="analytics-value success">₹<span id="analytics-in-hand">0</span></div>
+            <div class="analytics-desc">Amount already received</div>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-title">Total Interest</div>
+            <div class="analytics-value">₹<span id="analytics-total-interest">0</span></div>
+            <div class="analytics-desc">Total interest collected</div>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-title">Active Lendings</div>
+            <div class="analytics-value">
+              <span id="analytics-active-count">0</span>
+              <span style="font-size: 0.8rem;">lendings</span>
+            </div>
+            <div class="analytics-desc">Currently active</div>
+          </div>
+        </div>
+
+        <!-- Breakdown by Type -->
+        <div class="analytics-breakdown">
+          <h3>Breakdown by Lending Type</h3>
+          <div id="breakdown-list" class="breakdown-list">
+            <!-- Breakdown will be populated here -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Settings Page -->
+      <div id="settings" class="page">
+        <div class="page-header">
+          <h1>Settings</h1>
+          <p>Storage & App Configuration</p>
+        </div>
+
+        <!-- GitHub Storage Configuration -->
+        <div class="settings-section" style="margin-bottom: 2rem;">
+          <h3>🐙 GitHub REST API Storage (Direct .json Sync)</h3>
+          <p style="font-size: 0.9rem; color: #666; margin-bottom: 1.25rem;">
+            Connect directly to your GitHub repository to read and write records into <code>backend/lendings.json</code>, <code>backend/loans.json</code>, and <code>backend/chits.json</code> without needing Google Sheets or a hosted backend server. Your personal token is saved securely in your browser's local storage only.
+          </p>
+
+          <form id="github-config-form" onsubmit="saveGithubConfig(event)" class="settings-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="gh-owner">GITHUB USERNAME / OWNER *</label>
+                <input type="text" id="gh-owner" placeholder="e.g., gokul2412" required>
+              </div>
+              <div class="form-group">
+                <label for="gh-repo">REPOSITORY NAME *</label>
+                <input type="text" id="gh-repo" placeholder="e.g., Finance-App" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="gh-branch">BRANCH *</label>
+                <input type="text" id="gh-branch" placeholder="main" value="main" required>
+              </div>
+              <div class="form-group">
+                <label for="gh-token">PERSONAL ACCESS TOKEN (PAT, required for saving)</label>
+                <input type="password" id="gh-token" placeholder="Optional for read-only access">
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px;">
+              <button type="submit" class="btn-primary" style="padding: 0.75rem 1.5rem; background: var(--accent-color); color: white; border: none; border-radius: 0.5rem; cursor: pointer;">💾 Save GitHub Settings</button>
+              <button type="button" class="btn-secondary" onclick="testGithubConnection()" style="padding: 0.75rem 1.5rem;">🔍 Test GitHub Connection</button>
+              <button type="button" class="btn-small" onclick="clearGithubConfig()" style="background: #e2e8f0; color: #333;">Clear Token</button>
+            </div>
+            <p id="github-status" style="margin-top: 12px; font-size: 14px; font-weight: 500;"></p>
+          </form>
+        </div>
+
+        <div class="settings-section" style="margin-bottom: 2rem;">
+          <h3>Backend & Storage Status</h3>
+          <p id="api-status" style="margin-bottom: 10px; font-size: 14px; color: #666;"></p>
+          <button class="btn-secondary" onclick="testApiConnection()">🔍 Test Storage / API Connection</button>
+        </div>
+
+        <div class="settings-section">
+          <h3>Data Management</h3>
+          <button class="btn-danger" onclick="exportData()">📥 Export Lendings CSV</button>
+          <button class="btn-danger" onclick="exportLoanReport()">📥 Export Loans CSV</button>
+          <button class="btn-danger" onclick="clearAllData()">🗑️ Clear All Data</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Payment Modal -->
+  <div id="payment-modal" class="modal-overlay" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="payment-modal-title">Record Payment</h3>
+        <button type="button" class="modal-close" onclick="closePaymentModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="payment-person" class="payment-person"></p>
+        <p id="payment-outstanding" class="payment-outstanding"></p>
+        <div class="form-row">
+          <label for="payment-amount">Amount Received (₹)</label>
+          <input type="number" id="payment-amount" step="0.01" min="0.01" placeholder="Enter amount received" required />
+        </div>
+        <div class="form-row">
+          <label for="payment-date">Date Received</label>
+          <input type="date" id="payment-date" required />
+        </div>
+        <div class="form-actions modal-actions">
+          <button type="button" class="btn-small btn-secondary" onclick="closePaymentModal()">Cancel</button>
+          <button type="button" id="payment-submit-button" class="btn-small" onclick="submitPayment()">Save Payment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loan Interest Modal -->
+  <div id="loan-interest-modal" class="modal-overlay" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Record Interest Payment</h3>
+        <button type="button" class="modal-close" onclick="closeLoanInterestModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="loan-interest-bank" class="payment-person"></p>
+        <div class="form-row">
+          <label for="loan-interest-amount">Amount Paid (₹)</label>
+          <input type="number" id="loan-interest-amount" min="0.01" step="0.01" required>
+        </div>
+        <div class="form-row">
+          <label for="loan-interest-date">Payment Date</label>
+          <input type="date" id="loan-interest-date" required>
+        </div>
+        <div class="form-actions modal-actions">
+          <button type="button" class="btn-small btn-secondary" onclick="closeLoanInterestModal()">Cancel</button>
+          <button type="button" class="btn-small" onclick="submitLoanInterest()">Save Payment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chit Payment Modal -->
+  <div id="chit-payment-modal" class="modal-overlay" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Record Chit Payment</h3>
+        <button type="button" class="modal-close" onclick="closeChitPaymentModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="chit-payment-person" class="payment-person"></p>
+        <div class="form-row">
+          <label for="chit-payment-amount">AMOUNT PAID (₹)</label>
+          <input type="number" id="chit-payment-amount" min="0.01" step="0.01" required>
+        </div>
+        <div class="form-row">
+          <label for="chit-payment-date">PAYMENT DATE</label>
+          <input type="date" id="chit-payment-date" required>
+        </div>
+        <div class="form-row">
+          <label for="chit-payment-note">NOTE</label>
+          <textarea id="chit-payment-note" placeholder="e.g., Salary received, cash in hand..." rows="3"></textarea>
+        </div>
+        <div class="form-actions modal-actions">
+          <button type="button" class="btn-small btn-secondary" onclick="closeChitPaymentModal()">Cancel</button>
+          <button type="button" class="btn-small" onclick="submitChitPayment()">Save Payment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chit Payment History Modal -->
+  <div id="chit-history-modal" class="modal-overlay" style="display:none;">
+    <div class="modal history-modal">
+      <div class="modal-header">
+        <h3 id="chit-history-title">Chit Payment History</h3>
+        <button type="button" class="modal-close" onclick="closeChitHistoryModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="chit-history-content"></div>
+        <div class="form-actions modal-actions">
+          <button type="button" class="btn-small btn-secondary" onclick="closeChitHistoryModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loan Payment History Modal -->
+  <div id="loan-history-modal" class="modal-overlay" style="display:none;">
+    <div class="modal history-modal">
+      <div class="modal-header">
+        <h3 id="loan-history-title">Loan Payment History</h3>
+        <button type="button" class="modal-close" onclick="closeLoanHistoryModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="loan-history-content"></div>
+        <div class="form-actions modal-actions">
+          <button type="button" class="btn-small btn-secondary" onclick="closeLoanHistoryModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lending Details Modal -->
+  <div id="details-modal" class="modal-overlay" style="display:none;">
+    <div class="modal details-modal">
+      <div class="modal-header">
+        <h3>Lending Details</h3>
+        <button type="button" class="modal-close" onclick="closeDetailsModal()">&times;</button>
+      </div>
+      <div class="modal-body details-modal-body">
+        <p id="details-person" class="payment-person"></p>
+        <p id="details-meta" class="payment-outstanding"></p>
+
+        <div id="details-summary" class="details-summary"></div>
+
+        <h4 style="margin: 16px 0 8px;">Payment History</h4>
+        <div id="details-payments"></div>
+      </div>
+      <div class="modal-body" style="padding-top:0;">
+        <div class="form-actions modal-actions">
+          <button type="button" class="btn-small btn-secondary" onclick="closeDetailsModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- <script src="config.js"></script> (Legacy Google Sheets config) -->
+  <script src="script.js"></script>
+</body>
+</html>
